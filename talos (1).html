@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TALOS — autonomous software engineering agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#4d5f4c;--green-deep:#384538;--green-soft:#6b7d6a;
+  --paper:#e5e1d6;--paper-warm:#ece8de;--paper-deep:#d8d3c5;
+  --ink:#2f382e;--ink-soft:#56604f;
+  --line:rgba(77,95,76,0.22);--line-soft:rgba(77,95,76,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-weight:400;line-height:1.65;overflow-x:hidden;position:relative}
+body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;background-image:radial-gradient(var(--line-soft) 1px,transparent 1px);background-size:5px 5px;opacity:.5}
+body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{position:relative;z-index:2}
+::selection{background:var(--green);color:var(--paper)}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,.serif{font-family:'Cormorant Garamond',serif}
+::-webkit-scrollbar{width:11px}
+::-webkit-scrollbar-track{background:var(--paper-deep)}
+::-webkit-scrollbar-thumb{background:var(--green-soft);border:2px solid var(--paper-deep)}
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:16px 34px;border-bottom:1px solid var(--line);background:rgba(229,225,214,0.85);backdrop-filter:blur(8px)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:5px;font-size:16px;color:var(--green-deep)}
+.brand .mark{width:18px;height:18px;border:2px solid var(--green);border-radius:50%;position:relative}
+.brand .mark::after{content:"";position:absolute;inset:3px;background:var(--green);border-radius:50%}
+.nav-links{display:flex;gap:30px;font-size:12px;letter-spacing:1px;color:var(--ink-soft)}
+.nav-links a{transition:color .2s;position:relative;padding-bottom:2px}
+.nav-links a:hover{color:var(--green)}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-2px;width:0;height:1px;background:var(--green);transition:width .25s}
+.nav-links a:hover::after{width:100%}
+.nav-cta{border:1px solid var(--green);padding:8px 18px;color:var(--green);font-size:12px;letter-spacing:1px;transition:all .2s;cursor:pointer;background:none;font-family:inherit}
+.nav-cta:hover{background:var(--green);color:var(--paper)}
+.x-link{color:var(--green);display:flex;align-items:center;transition:opacity .2s,transform .2s}
+.x-link:hover{opacity:.6;transform:translateY(-1px)}
+@media(max-width:820px){.nav-links{display:none}}
+.hero{min-height:100vh;display:grid;grid-template-columns:1.1fr 0.9fr;padding-top:58px;position:relative}
+@media(max-width:900px){.hero{grid-template-columns:1fr}}
+.hero-left{padding:70px 34px 70px 56px;display:flex;flex-direction:column;justify-content:center}
+@media(max-width:900px){.hero-left{padding:48px 26px}}
+.kicker{font-size:11px;letter-spacing:4px;color:var(--green);margin-bottom:30px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.kicker .built{color:var(--green);border:1px solid var(--line);padding:4px 9px;font-size:10px;letter-spacing:2px}
+h1{font-size:clamp(52px,8.5vw,108px);line-height:0.9;font-weight:600;letter-spacing:-1px;margin-bottom:26px;color:var(--green-deep)}
+h1 em{font-style:italic;font-weight:500;color:var(--green)}
+.subhead{font-size:16px;color:var(--ink-soft);max-width:540px;margin-bottom:38px;line-height:1.8}
+.subhead b{color:var(--ink);font-weight:500}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+.btn-prime{background:var(--green);color:var(--paper-warm);font-weight:500;letter-spacing:1px;padding:15px 30px;font-size:13px;border:1px solid var(--green);cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-prime:hover{background:var(--green-deep);transform:translateY(-2px);box-shadow:4px 6px 0 rgba(77,95,76,.25)}
+.btn-ghost{border:1px solid var(--green);color:var(--green);padding:15px 30px;font-size:13px;letter-spacing:1px;transition:all .2s;cursor:pointer;background:none;font-family:inherit}
+.btn-ghost:hover{background:rgba(77,95,76,.08)}
+.hero-stats{display:flex;gap:44px;flex-wrap:wrap}
+.stat .n{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:600;color:var(--green);line-height:1}
+.stat .l{font-size:10px;letter-spacing:2px;color:var(--ink-soft);text-transform:uppercase;margin-top:6px}
+.hero-right{position:relative;border-left:1px solid var(--line);overflow:hidden;background:var(--paper-warm);display:flex;align-items:flex-end;justify-content:center;min-height:340px}
+@media(max-width:900px){.hero-right{border-left:none;border-top:1px solid var(--line);min-height:420px}}
+.temple{width:100%;height:100%;position:absolute;inset:0}
+.temple svg{width:100%;height:100%;display:block}
+.temple-label{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:3px;color:var(--green-soft);z-index:3;text-align:center;width:90%}
+section{padding:100px 56px;border-top:1px solid var(--line);position:relative}
+@media(max-width:820px){section{padding:70px 24px}}
+.sec-head{margin-bottom:58px}
+.sec-tag{font-size:11px;letter-spacing:4px;color:var(--green);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.sec-tag::before{content:"";width:28px;height:1px;background:var(--green)}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(34px,5vw,60px);font-weight:600;letter-spacing:-0.5px;color:var(--green-deep);max-width:840px;line-height:1.02}
+.sec-title em{font-style:italic;color:var(--green)}
+.sec-sub{color:var(--ink-soft);max-width:640px;margin-top:20px;font-size:15px;line-height:1.8}
+.agents{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);background:var(--paper-warm)}
+@media(max-width:900px){.agents{grid-template-columns:1fr}}
+.agent{padding:34px 30px;border-right:1px solid var(--line);position:relative;transition:background .25s}
+.agent:last-child{border-right:none}
+@media(max-width:900px){.agent{border-right:none;border-bottom:1px solid var(--line)}}
+.agent:hover{background:var(--paper-deep)}
+.agent .role{font-size:11px;letter-spacing:3px;margin-bottom:10px;color:var(--green)}
+.agent .nm{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--green-deep);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.agent .nm .live{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.agent p{font-size:13px;color:var(--ink-soft);line-height:1.7;margin-bottom:20px}
+.agent ul{list-style:none;font-size:12px}
+.agent li{padding:5px 0;color:var(--ink);display:flex;gap:9px;align-items:baseline}
+.agent li::before{content:"—";color:var(--green-soft)}
+.deploys{display:flex;gap:12px;flex-wrap:wrap;margin-top:38px}
+.deploy-chip{border:1px solid var(--line);padding:11px 20px;font-size:12px;letter-spacing:1px;color:var(--ink-soft);display:flex;align-items:center;gap:9px;transition:all .2s}
+.deploy-chip:hover{border-color:var(--green);color:var(--green)}
+.deploy-chip .d{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.term-sec{background:var(--green-deep)}
+.term-sec .sec-tag{color:var(--paper-warm)}
+.term-sec .sec-tag::before{background:var(--paper-warm)}
+.term-sec .sec-title{color:var(--paper-warm)}
+.term-sec .sec-title em{color:var(--paper-deep)}
+.term{margin-top:10px;background:#2c352c;border:1px solid rgba(229,225,214,0.18);box-shadow:0 20px 60px rgba(0,0,0,.25);font-size:13.5px;max-width:880px}
+.term-bar{display:flex;align-items:center;gap:8px;padding:11px 15px;border-bottom:1px solid rgba(229,225,214,0.12);background:rgba(229,225,214,0.04)}
+.dot{width:11px;height:11px;border-radius:50%}
+.dot.r{background:#c98b6e}.dot.y{background:#cbb46e}.dot.g{background:#8fb07e}
+.term-title{margin-left:auto;font-size:11px;color:rgba(229,225,214,.45);letter-spacing:1px}
+.term-body{padding:20px 18px;min-height:360px;color:#cdd6cb}
+.tline{white-space:pre-wrap;margin-bottom:3px;font-size:13px}
+.tline .p{color:#8fb07e}.tline .d{color:rgba(229,225,214,.4)}
+.tline .a{color:#cbb46e}.tline .c{color:#9cc0d4}.tline .m{color:#c98b6e}.tline .ok{color:#8fb07e}
+.cursor{display:inline-block;width:8px;height:15px;background:#8fb07e;animation:blink 1s steps(1) infinite;vertical-align:-2px}
+@keyframes blink{50%{opacity:0}}
+.feat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+@media(max-width:780px){.feat-grid{grid-template-columns:1fr}}
+.feat{background:var(--paper);padding:38px 32px;transition:background .25s}
+.feat:hover{background:var(--paper-warm)}
+.feat .num{font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--green-soft);letter-spacing:2px;margin-bottom:18px}
+.feat h3{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--green-deep);margin-bottom:13px;font-weight:600}
+.feat p{font-size:13px;color:var(--ink-soft);line-height:1.75}
+.feat .tag{display:inline-block;margin-top:18px;font-size:10px;letter-spacing:1px;color:var(--green);border:1px solid var(--line);padding:4px 10px}
+.moa{display:grid;grid-template-columns:1fr 1fr;gap:54px;align-items:center}
+@media(max-width:900px){.moa{grid-template-columns:1fr;gap:36px}}
+.moa-vis{border:1px solid var(--line);background:var(--paper-warm);padding:34px;font-size:12px}
+.layer{margin-bottom:20px}
+.layer-label{font-size:10px;letter-spacing:2px;color:var(--green);margin-bottom:12px}
+.nodes{display:flex;gap:10px;flex-wrap:wrap}
+.node{flex:1;min-width:84px;border:1px solid var(--line);padding:14px 8px;text-align:center;font-size:11px;color:var(--ink);background:var(--paper);transition:all .3s}
+.node.active{border-color:var(--green);color:var(--green);background:var(--paper-deep);box-shadow:3px 3px 0 rgba(77,95,76,.18)}
+.node small{display:block;color:var(--ink-soft);font-size:9px;margin-top:4px}
+.flow-arrow{text-align:center;color:var(--green-soft);font-size:16px;margin:8px 0}
+.moa-txt h3{font-family:'Cormorant Garamond',serif;font-size:34px;color:var(--green-deep);margin-bottom:20px;font-weight:600}
+.moa-txt p{color:var(--ink-soft);font-size:14px;margin-bottom:18px;line-height:1.8}
+.moa-txt .hl{color:var(--green);font-style:italic;font-family:'Cormorant Garamond',serif;font-size:16px}
+.evo{border:1px solid var(--line);background:var(--paper-warm);font-size:13px}
+.evo-row{display:grid;grid-template-columns:150px 1fr 70px;gap:18px;padding:16px 24px;border-bottom:1px solid var(--line);align-items:center}
+.evo-row:last-child{border-bottom:none}
+.evo-row.head{color:var(--green);font-size:10px;letter-spacing:2px}
+.evo-skill{color:var(--ink)}
+.evo-bar{height:7px;background:var(--paper-deep);position:relative;overflow:hidden;border:1px solid var(--line-soft)}
+.evo-bar span{position:absolute;left:0;top:0;bottom:0;background:var(--green);width:0;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.evo-lvl{text-align:right;color:var(--green);font-weight:600;font-family:'Cormorant Garamond',serif;font-size:18px}
+@media(max-width:600px){.evo-row{grid-template-columns:100px 1fr 48px;gap:12px;font-size:11px;padding:14px 16px}}
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);background:var(--paper-warm)}
+@media(max-width:900px){.price-grid{grid-template-columns:1fr}}
+.price{padding:38px 30px;border-right:1px solid var(--line);position:relative}
+.price:last-child{border-right:none}
+@media(max-width:900px){.price{border-right:none;border-bottom:1px solid var(--line)}}
+.price.feat-plan{background:var(--green-deep);color:var(--paper-warm)}
+.price.feat-plan .pname,.price.feat-plan .amt small,.price.feat-plan li{color:rgba(229,225,214,.7)}
+.price.feat-plan .amt{color:var(--paper-warm)}
+.price.feat-plan li{border-bottom-color:rgba(229,225,214,.15)}
+.price.feat-plan li::before{color:var(--paper-warm)}
+.price.feat-plan::before{content:"\25C6 MOST DEPLOYED";position:absolute;top:16px;right:20px;font-size:9px;color:var(--paper-warm);letter-spacing:1px;opacity:.7}
+.price .pname{font-size:13px;letter-spacing:3px;color:var(--green);margin-bottom:18px}
+.price .amt{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:600;color:var(--green-deep);line-height:1}
+.price .amt small{font-size:14px;color:var(--ink-soft);font-weight:400;font-family:'IBM Plex Mono',monospace}
+.price ul{list-style:none;margin:26px 0;font-size:13px}
+.price li{padding:8px 0;color:var(--ink-soft);display:flex;gap:10px;border-bottom:1px dashed var(--line);align-items:baseline}
+.price li::before{content:"+";color:var(--green)}
+.price .pbtn{display:block;width:100%;text-align:center;border:1px solid var(--green);padding:13px;color:var(--green);font-size:12px;letter-spacing:1px;transition:all .2s;cursor:pointer;background:none;font-family:inherit}
+.price.feat-plan .pbtn{background:var(--paper-warm);color:var(--green-deep);border-color:var(--paper-warm);font-weight:500}
+.price .pbtn:hover{background:var(--green);color:var(--paper-warm)}
+.price.feat-plan .pbtn:hover{background:transparent;color:var(--paper-warm)}
+.backed{text-align:center}
+.backed .sec-tag{justify-content:center}
+.backed .sec-tag::before{display:none}
+.logo-row{display:flex;gap:44px;justify-content:center;flex-wrap:wrap;margin-top:34px;opacity:.7}
+.logo-row span{font-size:15px;letter-spacing:2px;color:var(--ink-soft);font-weight:500}
+.cta-band{text-align:center;padding:120px 24px;background:var(--green-deep);color:var(--paper-warm)}
+.cta-band h2{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,6vw,76px);font-weight:600;letter-spacing:-1px;margin-bottom:22px;line-height:1}
+.cta-band h2 em{font-style:italic;color:var(--paper-deep)}
+.cta-band p{color:rgba(229,225,214,.7);margin-bottom:40px;max-width:540px;margin-left:auto;margin-right:auto;font-size:15px}
+.email-form{display:flex;gap:0;max-width:480px;margin:0 auto;border:1px solid rgba(229,225,214,.4)}
+.email-form input{flex:1;background:rgba(229,225,214,.06);border:none;padding:16px 20px;color:var(--paper-warm);font-family:inherit;font-size:14px;outline:none}
+.email-form input::placeholder{color:rgba(229,225,214,.4)}
+.email-form input:focus{background:rgba(229,225,214,.12)}
+.email-form button{background:var(--paper-warm);color:var(--green-deep);border:none;padding:16px 28px;font-family:inherit;font-size:13px;font-weight:500;letter-spacing:1px;cursor:pointer;transition:background .2s;white-space:nowrap}
+.email-form button:hover{background:var(--paper)}
+.form-msg{margin-top:18px;font-size:13px;min-height:20px;letter-spacing:.5px}
+.form-msg.ok{color:var(--paper-warm)}
+.form-msg.err{color:var(--paper-warm);opacity:.65;text-decoration:underline}
+#modalMsg.ok{color:var(--green)}
+#modalMsg.err{color:var(--green);opacity:.7;text-decoration:underline}
+@media(max-width:520px){.email-form{flex-direction:column}.email-form input{border-bottom:1px solid rgba(229,225,214,.3)}}
+.signups{margin-top:28px;font-size:11px;color:rgba(229,225,214,.45);letter-spacing:1px}
+footer{background:var(--paper);padding:54px 56px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;font-size:12px;color:var(--ink-soft);border-top:1px solid var(--line)}
+@media(max-width:780px){footer{padding:40px 24px}}
+.foot-col h4{color:var(--green);font-size:11px;letter-spacing:2px;margin-bottom:16px}
+.foot-col a{display:block;padding:5px 0;transition:color .2s}
+.foot-col a:hover{color:var(--green)}
+.foot-brand{max-width:300px}
+.foot-brand .ttl{font-family:'Cormorant Garamond',serif;font-weight:600;letter-spacing:4px;margin-bottom:14px;font-size:22px;color:var(--green-deep)}
+.modal{position:fixed;inset:0;z-index:1000;background:rgba(47,56,46,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:24px}
+.modal.show{display:flex}
+.modal-box{background:var(--paper);border:1px solid var(--green);max-width:440px;width:100%;padding:40px 36px;position:relative;box-shadow:10px 12px 0 rgba(77,95,76,.2)}
+.modal-box h3{font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--green-deep);margin-bottom:14px}
+.modal-box p{font-size:13px;color:var(--ink-soft);margin-bottom:24px;line-height:1.7}
+.modal-close{position:absolute;top:16px;right:18px;cursor:pointer;font-size:18px;color:var(--ink-soft);background:none;border:none}
+.modal-close:hover{color:var(--green)}
+.page{position:fixed;inset:0;z-index:1100;background:var(--paper);overflow-y:auto;display:none;animation:pgfade .35s ease}
+.page.show{display:block}
+@keyframes pgfade{from{opacity:0}to{opacity:1}}
+.page-bar{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:18px 34px;border-bottom:1px solid var(--line);background:rgba(229,225,214,0.9);backdrop-filter:blur(8px);z-index:5}
+.page-bar .pb-brand{display:flex;align-items:center;gap:10px;font-family:'Cormorant Garamond',serif;font-weight:600;letter-spacing:4px;color:var(--green-deep);font-size:18px;cursor:pointer}
+.page-bar .pb-brand .mark{width:15px;height:15px;border:2px solid var(--green);border-radius:50%;position:relative}
+.page-bar .pb-brand .mark::after{content:"";position:absolute;inset:2px;background:var(--green);border-radius:50%}
+.pb-close{background:none;border:1px solid var(--green);color:var(--green);font-family:inherit;font-size:12px;letter-spacing:1px;padding:8px 16px;cursor:pointer;transition:all .2s}
+.pb-close:hover{background:var(--green);color:var(--paper)}
+.page-inner{max-width:760px;margin:0 auto;padding:72px 34px 120px}
+.page-inner .eyebrow{font-size:11px;letter-spacing:4px;color:var(--green);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+.page-inner .eyebrow::before{content:"";width:28px;height:1px;background:var(--green)}
+.page-inner h1{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,7vw,72px);font-weight:600;color:var(--green-deep);line-height:1;margin-bottom:14px;letter-spacing:-1px}
+.page-inner h1 em{font-style:italic;color:var(--green)}
+.page-inner .lede{font-size:17px;color:var(--ink-soft);line-height:1.75;margin-bottom:46px;max-width:620px}
+.page-inner h2{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--green-deep);margin:44px 0 16px}
+.page-inner p{font-size:14.5px;color:var(--ink-soft);line-height:1.85;margin-bottom:18px}
+.page-inner p b{color:var(--ink);font-weight:500}
+.page-inner ul{list-style:none;margin:0 0 18px}
+.page-inner li{font-size:14.5px;color:var(--ink-soft);line-height:1.8;padding:7px 0 7px 24px;position:relative;border-bottom:1px dashed var(--line)}
+.page-inner li::before{content:"—";position:absolute;left:0;color:var(--green)}
+.page-inner li:last-child{border-bottom:none}
+.page-inner blockquote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;line-height:1.4;color:var(--green-deep);border-left:2px solid var(--green);padding:6px 0 6px 24px;margin:34px 0}
+.code-block{background:var(--green-deep);color:var(--paper-warm);font-family:'IBM Plex Mono',monospace;font-size:13px;padding:20px 22px;margin:14px 0 26px;overflow-x:auto;line-height:1.7}
+.code-block .cmt{opacity:.55}
+.job{border:1px solid var(--line);padding:24px 26px;margin-bottom:14px;transition:background .2s;cursor:pointer}
+.job:hover{background:var(--paper-warm)}
+.job .jt{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;color:var(--green-deep);margin-bottom:6px}
+.job .jm{font-size:12px;letter-spacing:1px;color:var(--green);display:flex;gap:14px;flex-wrap:wrap}
+.page-cta{margin-top:40px;display:flex;gap:14px;flex-wrap:wrap}
+.docs-nav{display:flex;gap:8px;flex-wrap:wrap;margin:30px 0 40px;border-bottom:1px solid var(--line);padding-bottom:24px}
+.docs-nav a{font-size:12px;letter-spacing:1px;border:1px solid var(--line);padding:8px 14px;color:var(--ink-soft);transition:all .2s}
+.docs-nav a:hover{border-color:var(--green);color:var(--green)}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s,transform .8s}
+.reveal.in{opacity:1;transform:none}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green-deep);color:var(--paper-warm);padding:14px 26px;font-size:13px;letter-spacing:.5px;z-index:1200;opacity:0;transition:all .35s;border:1px solid rgba(229,225,214,.2)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <div class="brand"><span class="mark"></span>TALOS</div>
+  <div class="nav-links">
+    <a href="#agents">agents</a><a href="#run">live run</a><a href="#moa">mixture</a><a href="#evolution">evolution</a><a href="#pricing">pricing</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:18px">
+    <a class="x-link" href="https://x.com/Talos_research" target="_blank" rel="noopener" aria-label="Talos on X">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    </a>
+    <button class="nav-cta" onclick="scrollToAccess()">request access &rarr;</button>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-left">
+    <div class="kicker">AUTONOMOUS SWE AGENT <span class="built">&#9884; BUILT ON NOUS RESEARCH</span></div>
+    <h1>The guardian<br>that <em>ships</em>.</h1>
+    <p class="subhead">In myth, Talos circled the shores three times a day, tireless and incorruptible. Ours circles your codebase &mdash; a <b>full-cycle software engineer</b> that scaffolds repos from zero, writes tests, debugs in loops, and ships to production, run by a <b>Mixture of Agents</b> that review one another and <b>evolve their own skills</b>.</p>
+    <div class="hero-cta">
+      <button class="btn-prime" onclick="scrollToAccess()">request early access</button>
+      <button class="btn-ghost" onclick="document.getElementById('run').scrollIntoView()">watch a live run &rarr;</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="n">214</div><div class="l">repos shipped</div></div>
+      <div class="stat"><div class="n">91%</div><div class="l">first-deploy pass</div></div>
+      <div class="stat"><div class="n">seed</div><div class="l">stage &middot; 2026</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="temple"><svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMax meet" id="templeSvg" aria-hidden="true"></svg></div>
+    <div class="temple-label">&#9884; TEMPLE OF THE TIRELESS ENGINEER &middot; ATTICA, MMXXVI</div>
+  </div>
+</header>
+<section id="agents">
+  <div class="sec-head reveal">
+    <div class="sec-tag">THE SWARM</div>
+    <h2 class="sec-title">Three specialists. <em>One pull request.</em></h2>
+    <p class="sec-sub">Every task wakes adversarial sub-agents that build, then tear each other's work apart in review &mdash; before a single line reaches your branch.</p>
+  </div>
+  <div class="agents reveal">
+    <div class="agent"><div class="role">FRONTEND &middot; AGENT</div><div class="nm"><span class="live"></span>Hermes-FE</div><p>Owns the interface layer. Components, state, accessibility, and pixel-faithful builds from a prompt or a design link.</p><ul><li>Framework-agnostic scaffolds</li><li>Visual regression checks</li><li>a11y + performance gates</li></ul></div>
+    <div class="agent"><div class="role">BACKEND &middot; AGENT</div><div class="nm"><span class="live"></span>Hermes-BE</div><p>Designs schemas, writes APIs, guards the contracts. Generates migrations and property-based tests automatically.</p><ul><li>API + DB schema synthesis</li><li>Fuzz + integration tests</li><li>Auth &amp; rate-limit hardening</li></ul></div>
+    <div class="agent"><div class="role">DEVOPS &middot; AGENT</div><div class="nm"><span class="live"></span>Agent-Smith</div><p>The shipper. Provisions infra, wires CI/CD, pushes to your platform of choice &mdash; then watches the rollout.</p><ul><li>Zero-config deploy pipelines</li><li>Rollback on failed health-check</li><li>Cost + log observability</li></ul></div>
+  </div>
+  <div class="deploys reveal">
+    <div class="deploy-chip"><span class="d"></span>Vercel</div><div class="deploy-chip"><span class="d"></span>Railway</div><div class="deploy-chip"><span class="d"></span>Fly.io</div><div class="deploy-chip"><span class="d"></span>AWS</div><div class="deploy-chip"><span class="d"></span>Cloudflare</div><div class="deploy-chip"><span class="d"></span>Render</div>
+  </div>
+</section>
+<section id="run" class="term-sec">
+  <div class="sec-head reveal"><div class="sec-tag">LIVE RUN</div><h2 class="sec-title">Watch the swarm <em>close a ticket.</em></h2></div>
+  <div class="term reveal">
+    <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="term-title">talos@swarm &mdash; agent-smith</span></div>
+    <div class="term-body" id="termBody"></div>
+  </div>
+</section>
+<section id="features">
+  <div class="sec-head reveal"><div class="sec-tag">CAPABILITIES</div><h2 class="sec-title">Full lifecycle. <em>Not just autocomplete.</em></h2></div>
+  <div class="feat-grid reveal">
+    <div class="feat"><div class="num">I.</div><h3>Repo from zero</h3><p>Describe a product in one sentence. Talos lays out the monorepo, picks the stack, configures tooling, and opens the first commit &mdash; structured, never boilerplate.</p><span class="tag">talos init</span></div>
+    <div class="feat"><div class="num">II.</div><h3>Test &rarr; debug loops</h3><p>The swarm writes failing tests first, implements until green, then runs adversarial regression. Stack traces become tasks, not your problem.</p><span class="tag">self-healing CI</span></div>
+    <div class="feat"><div class="num">III.</div><h3>Persistent project memory</h3><p>Every repo carries its own long-horizon memory: decisions, conventions, past bugs, and architectural intent &mdash; so the agent never re-litigates a settled call.</p><span class="tag">per-repo context</span></div>
+    <div class="feat"><div class="num">IV.</div><h3>Cross-agent code review</h3><p>Frontend critiques backend. DevOps blocks unsafe merges. Disagreements resolve through a structured debate before anything lands.</p><span class="tag">adversarial review</span></div>
+  </div>
+</section>
+<section id="moa">
+  <div class="sec-head reveal"><div class="sec-tag">ARCHITECTURE</div><h2 class="sec-title">Mixture of Agents, <em>applied to code.</em></h2><p class="sec-sub">From the open research lineage Talos is built on &mdash; layered agents propose, aggregate, and refine. No single model is a single point of failure.</p></div>
+  <div class="moa reveal">
+    <div class="moa-vis" id="moaVis">
+      <div class="layer"><div class="layer-label">LAYER 0 &middot; PROPOSERS</div><div class="nodes"><div class="node">Hermes-FE<small>ui synthesis</small></div><div class="node">Hermes-BE<small>logic + data</small></div><div class="node">Agent-Smith<small>infra</small></div></div></div>
+      <div class="flow-arrow">&darr; &darr; &darr;</div>
+      <div class="layer"><div class="layer-label">LAYER 1 &middot; AGGREGATOR</div><div class="nodes"><div class="node">Consensus + conflict resolution<small>structured debate</small></div></div></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="layer"><div class="layer-label">LAYER 2 &middot; VERIFIER</div><div class="nodes"><div class="node">Tests &middot; review &middot; deploy gate<small>green or block</small></div></div></div>
+    </div>
+    <div class="moa-txt">
+      <h3>Many minds, one merge.</h3>
+      <p>Each proposer generates a candidate independently. The aggregator doesn't average &mdash; it <span class="hl">debates</span>, surfacing the strongest reasoning and discarding the rest.</p>
+      <p>A dedicated verifier holds the gate: nothing ships without passing tests and a clean cross-agent review. Reliability compounds instead of hallucination accumulating.</p>
+      <p>Because the topology is dynamic, Talos scales agents to the difficulty of the task &mdash; a typo wakes one; a migration wakes the whole swarm.</p>
+    </div>
+  </div>
+</section>
+<section id="evolution">
+  <div class="sec-head reveal"><div class="sec-tag">SKILL EVOLUTION</div><h2 class="sec-title">It gets better at <em>your</em> codebase.</h2><p class="sec-sub">Talos distills repeated work into reusable skills. The more it touches a repo, the higher its mastery climbs &mdash; and skills transfer across your whole org.</p></div>
+  <div class="evo reveal" id="evoTable">
+    <div class="evo-row head"><div>SKILL</div><div>MASTERY</div><div>LVL</div></div>
+    <div class="evo-row"><div class="evo-skill">migrations</div><div class="evo-bar"><span data-w="92"></span></div><div class="evo-lvl">L9</div></div>
+    <div class="evo-row"><div class="evo-skill">react-perf</div><div class="evo-bar"><span data-w="78"></span></div><div class="evo-lvl">L7</div></div>
+    <div class="evo-row"><div class="evo-skill">auth-flows</div><div class="evo-bar"><span data-w="85"></span></div><div class="evo-lvl">L8</div></div>
+    <div class="evo-row"><div class="evo-skill">k8s-deploy</div><div class="evo-bar"><span data-w="64"></span></div><div class="evo-lvl">L6</div></div>
+    <div class="evo-row"><div class="evo-skill">flaky-test-triage</div><div class="evo-bar"><span data-w="71"></span></div><div class="evo-lvl">L7</div></div>
+  </div>
+</section>
+<section id="pricing">
+  <div class="sec-head reveal"><div class="sec-tag">PRICING</div><h2 class="sec-title">Pay for <em>shipped</em>, not for tokens.</h2></div>
+  <div class="price-grid reveal">
+    <div class="price"><div class="pname">HACKER</div><div class="amt">$0<small>/mo</small></div><ul><li>1 active repo</li><li>single-agent mode</li><li>community deploy targets</li><li>7-day project memory</li></ul><button class="pbtn" onclick="choosePlan('Hacker')">start free</button></div>
+    <div class="price feat-plan"><div class="pname">SWARM</div><div class="amt">$89<small>/mo</small></div><ul><li>unlimited repos</li><li>full 3-agent MoA</li><li>all deploy targets</li><li>persistent memory + skill evolution</li><li>adversarial code review</li></ul><button class="pbtn" onclick="choosePlan('Swarm')">deploy the swarm</button></div>
+    <div class="price"><div class="pname">FORGE &middot; ENTERPRISE</div><div class="amt">custom</div><ul><li>self-hosted swarm</li><li>org-wide skill transfer</li><li>SOC2 + audit trails</li><li>dedicated solutions agent</li></ul><button class="pbtn" onclick="choosePlan('Forge')">talk to us</button></div>
+  </div>
+</section>
+<section class="backed reveal">
+  <div class="sec-tag">BACKED BY BUILDERS</div>
+  <h2 class="sec-title" style="margin:0 auto">Early, <em>and building in the open.</em></h2>
+  <div class="logo-row"><span>NOUS RESEARCH</span><span>ANGELS</span><span>OPEN-SOURCE</span></div>
+</section>
+<div class="cta-band" id="access">
+  <h2>Summon the <em>guardian</em>.</h2>
+  <p>Spin up the swarm on your first repo in under 90 seconds. Drop your email and we'll send an access key for the next cohort.</p>
+  <form class="email-form" id="accessForm" novalidate>
+    <input type="email" id="emailInput" placeholder="you@company.com" autocomplete="email" aria-label="email">
+    <button type="submit">request access &rarr;</button>
+  </form>
+  <div class="form-msg" id="formMsg"></div>
+  <div class="signups" id="signupCount">&mdash; join 142 engineers on the waitlist &mdash;</div>
+</div>
+<footer>
+  <div class="foot-col foot-brand"><div class="ttl">&#9884; TALOS</div><p style="line-height:1.75">Autonomous software engineering, built on open research. The guardian that closes tickets while you close your laptop.</p><p style="margin-top:14px;color:var(--green)">&#9884; built on Nous Research</p></div>
+  <div class="foot-col"><h4>PRODUCT</h4><a href="#agents">the swarm</a><a href="#moa">architecture</a><a href="#evolution">skill evolution</a><a href="#pricing">pricing</a></div>
+  <div class="foot-col"><h4>DEVELOPERS</h4><a href="#run">live run</a><a href="#" onclick="comingSoon(event)">API</a><a href="#" onclick="comingSoon(event)">changelog</a><a href="https://github.com/Talos-research" target="_blank" rel="noopener">github</a></div>
+  <div class="foot-col"><h4>COMPANY</h4><a href="#" onclick="openPage(event,'manifesto')">manifesto</a><a href="#" onclick="openPage(event,'research')">research</a><a href="#" onclick="openPage(event,'careers')">careers</a><a href="#" onclick="openPage(event,'docs')">docs</a>
+  </div>
+</footer>
+</div>
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">&#10005;</button>
+    <h3 id="modalTitle">Plan selected</h3>
+    <p id="modalBody">Leave your email and we'll set you up.</p>
+    <form class="email-form" id="modalForm" style="border-color:var(--line);" novalidate>
+      <input type="email" id="modalEmail" placeholder="you@company.com" aria-label="email" style="background:var(--paper-warm);color:var(--ink)">
+      <button type="submit" style="background:var(--green);color:var(--paper-warm)">confirm</button>
+    </form>
+    <div class="form-msg" id="modalMsg" style="text-align:left"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="page" id="page">
+  <div class="page-bar">
+    <div class="pb-brand" onclick="closePage()"><span class="mark"></span>TALOS</div>
+    <button class="pb-close" onclick="closePage()">&larr; back to site</button>
+  </div>
+  <div class="page-inner" id="pageInner"></div>
+</div>
+<script>
+(function(){
+  var svg=document.getElementById('templeSvg');
+  var W=400,H=400,step=6,r=2.0,green="#4d5f4c";
+  function density(x,y){
+    var d=0;var groundTop=250;
+    if(y>groundTop){d=Math.min(1,(y-groundTop)/120);}
+    var tLeft=120,tRight=300,baseY=300,roofY=150;
+    if(x>tLeft&&x<tRight&&y>roofY&&y<baseY){
+      if(y>190&&y<290){var col=Math.sin((x-tLeft)/(tRight-tLeft)*Math.PI*9);d=Math.max(d,col>0?0.92:0.18);}
+      else if(y>=150&&y<=190){d=Math.max(d,0.85);}
+      else if(y>=290&&y<300){d=Math.max(d,0.9);}
+    }
+    var apexX=210,peakY=120,basePedY=152,halfW=92;
+    if(y>peakY&&y<basePedY){var t=(y-peakY)/(basePedY-peakY);var left=apexX-halfW*t,right=apexX+halfW*t;if(x>left&&x<right)d=Math.max(d,0.8);}
+    if(x>70&&x<92&&y>175&&y<295)d=Math.max(d,0.9);
+    if(x>96&&x<112&&y>205&&y<295)d=Math.max(d,0.6);
+    var fx=330,fy=330;var fd=Math.hypot(x-fx,y-fy);if(fd<70)d=Math.max(d,(1-fd/70)*0.85);
+    return Math.min(1,d);
+  }
+  var dots="";
+  for(var y=60;y<H;y+=step){
+    for(var x=10;x<W;x+=step){
+      var d=density(x,y);if(d<=0.02)continue;
+      if(Math.random()>d*0.55+0.25)continue;
+      var jx=(Math.random()-0.5)*1.4,jy=(Math.random()-0.5)*1.4;
+      var rad=r*(0.45+d*0.85);var op=0.25+d*0.7;
+      dots+='<circle cx="'+(x+jx).toFixed(1)+'" cy="'+(y+jy).toFixed(1)+'" r="'+rad.toFixed(2)+'" fill="'+green+'" opacity="'+op.toFixed(2)+'"/>';
+    }
+  }
+  svg.innerHTML=dots;
+})();
+var lines=[
+ {t:'<span class="p">talos@swarm</span>:<span class="c">~</span>$ talos init payments-api',d:140},
+ {t:'<span class="d">&rarr; analyzing intent... matching stack</span>',d:480},
+ {t:'<span class="ok">&#10004;</span> scaffolded monorepo &middot; 41 files',d:340},
+ {t:'',d:120},
+ {t:'<span class="a">[Hermes-BE]</span> drafting schema + routes...',d:440},
+ {t:'<span class="c">[Hermes-FE]</span> building dashboard shell...',d:440},
+ {t:'<span class="m">[Agent-Smith]</span> provisioning Railway...',d:480},
+ {t:'',d:120},
+ {t:'<span class="d">&rarr; running 312 generated tests</span>',d:520},
+ {t:'<span class="ok">&#10004;</span> 312 / 312 passing',d:360},
+ {t:'',d:120},
+ {t:'<span class="a">[review]</span> Hermes-FE flags BE: unhandled 429',d:520},
+ {t:'<span class="ok">&#10004;</span> retry + backoff patched &middot; re-reviewed',d:400},
+ {t:'',d:120},
+ {t:'<span class="m">[Agent-Smith]</span> deploying &rarr; <span class="c">prod</span>',d:520},
+ {t:'<span class="ok">&#10004;</span> live at payments-api.up.railway.app',d:300},
+ {t:'<span class="d">&rarr; skill +1 &middot; "stripe-webhooks" &rarr; L6</span>',d:380},
+ {t:'',d:200},
+ {t:'<span class="p">talos@swarm</span>:<span class="c">~</span>$ <span class="cursor"></span>',d:0}
+];
+var body=document.getElementById('termBody');var i=0;
+function boot(){
+  if(i>=lines.length){setTimeout(function(){body.innerHTML='';i=0;boot();},6000);return;}
+  var el=document.createElement('div');el.className='tline';el.innerHTML=lines[i].t;
+  body.appendChild(el);body.scrollTop=body.scrollHeight;var d=lines[i].d;i++;setTimeout(boot,d);
+}
+boot();
+var moaNodes=document.querySelectorAll('#moaVis .node');var mi=0;
+setInterval(function(){moaNodes.forEach(function(n){n.classList.remove('active');});moaNodes[mi%moaNodes.length].classList.add('active');mi++;},900);
+var io=new IntersectionObserver(function(es){es.forEach(function(e){
+  if(e.isIntersecting){e.target.classList.add('in');
+    if(e.target.id==='evoTable'){e.target.querySelectorAll('.evo-bar span').forEach(function(s){s.style.width=s.dataset.w+'%';});}}
+});},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+function scrollToAccess(){document.getElementById('access').scrollIntoView();setTimeout(function(){document.getElementById('emailInput').focus();},600);}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tm);t._tm=setTimeout(function(){t.classList.remove('show');},3200);}
+function comingSoon(e){e.preventDefault();toast('\u25F7 Coming soon \u2014 request access for the beta.');}
+function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
+var signups=142;
+function bumpCount(){signups++;document.getElementById('signupCount').textContent='\u2014 join '+signups.toLocaleString()+' engineers on the waitlist \u2014';}
+document.getElementById('accessForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var inp=document.getElementById('emailInput');var msg=document.getElementById('formMsg');var v=inp.value.trim();
+  if(!validEmail(v)){msg.className='form-msg err';msg.textContent='\u2715 Please enter a valid email address.';return;}
+  msg.className='form-msg ok';msg.textContent='\u2714 Access key requested for '+v+' \u2014 check your inbox.';
+  inp.value='';bumpCount();toast('\u269C Welcome to the swarm, '+v.split('@')[0]+'.');
+});
+var planCopy={
+  Hacker:{t:'Start free',b:'The Hacker tier is free forever \u2014 one active repo, single-agent mode. Drop your email and we\'ll send your CLI key.'},
+  Swarm:{t:'Deploy the Swarm',b:'The full 3-agent Mixture of Agents at $89/mo. Leave your email to claim a cohort slot.'},
+  Forge:{t:'Forge \u00B7 Enterprise',b:'Self-hosted swarm with org-wide skill transfer & SOC2. Leave your work email and our solutions agent will reach out.'}
+};
+var currentPlan='Swarm';
+function choosePlan(p){
+  currentPlan=p;
+  document.getElementById('modalTitle').textContent=planCopy[p].t;
+  document.getElementById('modalBody').textContent=planCopy[p].b;
+  document.getElementById('modalMsg').textContent='';
+  document.getElementById('modalEmail').value='';
+  document.getElementById('modal').classList.add('show');
+  setTimeout(function(){document.getElementById('modalEmail').focus();},100);
+}
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+document.getElementById('modal').addEventListener('click',function(e){if(e.target.id==='modal')closeModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+document.getElementById('modalForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var v=document.getElementById('modalEmail').value.trim();var msg=document.getElementById('modalMsg');
+  if(!validEmail(v)){msg.className='form-msg err';msg.textContent='\u2715 Enter a valid email.';return;}
+  msg.className='form-msg ok';msg.textContent='\u2714 '+currentPlan+' requested for '+v+'.';
+  bumpCount();
+  setTimeout(function(){closeModal();toast('\u269C '+currentPlan+' plan \u2014 confirmation sent to '+v+'.');},900);
+});
+
+/* ===== content pages: manifesto / research / careers / docs ===== */
+var PAGES={
+ manifesto:'<div class="eyebrow">MANIFESTO</div>'+
+   '<h1>Software should <em>build itself.</em></h1>'+
+   '<p class="lede">We are drowning in backlog. Not because engineers are slow, but because the work of shipping software \u2014 the scaffolding, the tests, the reviews, the deploys \u2014 is mechanical, repetitive, and endless. Talos exists to take that weight off human hands.</p>'+
+   '<blockquote>In myth, Talos circled the island three times a day. Tireless. Incorruptible. A guardian, not a tool.</blockquote>'+
+   '<h2>Three beliefs</h2>'+
+   '<p><b>Agents, not autocomplete.</b> A copilot waits for you to type. A guardian owns the whole cycle \u2014 from an empty directory to a running service in production. We build for autonomy, not suggestion.</p>'+
+   '<p><b>Many minds beat one model.</b> No single model should be a single point of failure. A Mixture of Agents that propose, debate, and verify each other produces work that is more reliable than any monolith. Reliability should compound, not degrade.</p>'+
+   '<p><b>Open by default.</b> Talos is built on open research. We publish what we learn, we contribute upstream, and we believe the future of autonomous engineering belongs in the open \u2014 not locked behind a black box.</p>'+
+   '<h2>What we refuse</h2>'+
+   '<ul><li>We will not ship code no human can understand or review.</li><li>We will not optimize for engagement over output.</li><li>We will not pretend the agent is infallible \u2014 every merge passes a gate.</li></ul>'+
+   '<p>If the backlog is the disease, Talos is the cure that never tires.</p>'+
+   '<div class="page-cta"><button class="btn-prime" onclick="closePage();scrollToAccess()">request early access</button></div>',
+
+ research:'<div class="eyebrow">RESEARCH</div>'+
+   '<h1>Built on <em>open research.</em></h1>'+
+   '<p class="lede">Talos is an applied research lab as much as a product. We study how multiple specialized agents can collaborate, disagree, and self-improve to engineer software with minimal human oversight \u2014 and we share what we find.</p>'+
+   '<h2>Active threads</h2>'+
+   '<p><b>Mixture of Agents (MoA) for code.</b> Layered topologies where proposer agents generate candidates independently, an aggregator resolves conflict through structured debate, and a verifier holds the deploy gate. We measure how reliability scales with the number and diversity of agents.</p>'+
+   '<p><b>Skill evolution.</b> How an agent distills repeated work into reusable, transferable skills \u2014 and how those skills mature (and transfer across an organization) the more a repository is touched.</p>'+
+   '<p><b>Persistent project memory.</b> Long-horizon memory per repository: decisions, conventions, past failures, and architectural intent that survive across sessions so settled questions stay settled.</p>'+
+   '<p><b>Adversarial review.</b> Sub-agents trained to critique one another \u2014 frontend against backend, devops blocking unsafe merges \u2014 and the protocols that let them converge.</p>'+
+   '<h2>How we publish</h2>'+
+   '<ul><li>Notes and write-ups in the open as work matures.</li><li>Reproducible evals over real repositories.</li><li>Upstream contributions to the tools we depend on.</li></ul>'+
+   '<p>Built on Nous Research. We stand on open shoulders, and we try to give back.</p>'+
+   '<div class="page-cta"><a class="btn-ghost" href="https://github.com/Talos-research" target="_blank" rel="noopener">read on github &rarr;</a></div>',
+
+ careers:'<div class="eyebrow">CAREERS</div>'+
+   '<h1>Help build the <em>tireless engineer.</em></h1>'+
+   '<p class="lede">We are a small, early team building autonomous software engineering in the open. We hire people who would rather ship a guardian than babysit a backlog. Remote-first, deeply technical, low-ego.</p>'+
+   '<h2>Open roles</h2>'+
+   '<div class="job" onclick="closePage();scrollToAccess()"><div class="jt">Founding Agent Engineer</div><div class="jm"><span>ENGINEERING</span><span>REMOTE</span><span>FULL-TIME</span></div></div>'+
+   '<div class="job" onclick="closePage();scrollToAccess()"><div class="jt">Research Engineer \u00B7 Mixture of Agents</div><div class="jm"><span>RESEARCH</span><span>REMOTE</span><span>FULL-TIME</span></div></div>'+
+   '<div class="job" onclick="closePage();scrollToAccess()"><div class="jt">Infrastructure / DevOps Engineer</div><div class="jm"><span>PLATFORM</span><span>REMOTE</span><span>FULL-TIME</span></div></div>'+
+   '<div class="job" onclick="closePage();scrollToAccess()"><div class="jt">Developer Experience &amp; Docs</div><div class="jm"><span>DEVREL</span><span>REMOTE</span><span>CONTRACT \u2192 FT</span></div></div>'+
+   '<h2>How we work</h2>'+
+   '<ul><li>Remote-first, async by default, written culture.</li><li>Small team, high trust, real ownership from day one.</li><li>We dogfood Talos to build Talos.</li></ul>'+
+   '<p>Don\'t see your exact role? We still want to hear from you.</p>'+
+   '<div class="page-cta"><button class="btn-prime" onclick="closePage();scrollToAccess()">introduce yourself</button></div>',
+
+ docs:'<div class="eyebrow">DOCUMENTATION</div>'+
+   '<h1>Get started with <em>Talos.</em></h1>'+
+   '<p class="lede">Go from an empty directory to a deployed service in under 90 seconds. This is the short version \u2014 full reference lands with the public beta.</p>'+
+   '<div class="docs-nav"><a href="#" onclick="return false">Install</a><a href="#" onclick="return false">Init</a><a href="#" onclick="return false">The swarm</a><a href="#" onclick="return false">Deploy</a><a href="#" onclick="return false">Memory</a></div>'+
+   '<h2>1 \u00B7 Install</h2>'+
+   '<div class="code-block"><span class="cmt"># macOS / Linux</span><br>curl -fsSL talos.sh/install | sh<br><br><span class="cmt"># or via npm</span><br>npm i -g @talos/cli</div>'+
+   '<h2>2 \u00B7 Initialize a repo</h2>'+
+   '<p>Describe the product in one sentence. Talos picks the stack, lays out the monorepo, and opens the first commit.</p>'+
+   '<div class="code-block">talos init payments-api<br><span class="cmt">\u2192 scaffolded monorepo \u00B7 41 files</span><br><span class="cmt">\u2714 first commit opened</span></div>'+
+   '<h2>3 \u00B7 Wake the swarm</h2>'+
+   '<p>Hand the swarm a task. Hermes-FE, Hermes-BE, and Agent-Smith build in parallel, review one another, and only merge what passes the gate.</p>'+
+   '<div class="code-block">talos run "add stripe checkout + webhook"<br><span class="cmt">[Hermes-BE] routes + schema</span><br><span class="cmt">[review] retry+backoff patched</span><br><span class="cmt">\u2714 312 / 312 tests passing</span></div>'+
+   '<h2>4 \u00B7 Ship it</h2>'+
+   '<div class="code-block">talos deploy --target railway<br><span class="cmt">\u2714 live at payments-api.up.railway.app</span></div>'+
+   '<p>Targets: <b>Vercel, Railway, Fly.io, AWS, Cloudflare, Render.</b></p>'+
+   '<h2>Persistent memory</h2>'+
+   '<p>Every repository keeps its own long-horizon memory \u2014 decisions, conventions, and past bugs \u2014 so the swarm never re-litigates a settled call. Skills it learns mature with use and transfer across your org.</p>'+
+   '<div class="page-cta"><button class="btn-prime" onclick="closePage();scrollToAccess()">request access to the beta</button><a class="btn-ghost" href="https://github.com/Talos-research" target="_blank" rel="noopener">github &rarr;</a></div>'
+};
+function openPage(e,key){
+  if(e)e.preventDefault();
+  document.getElementById('pageInner').innerHTML=PAGES[key]||'';
+  var pg=document.getElementById('page');pg.classList.add('show');pg.scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+function closePage(){document.getElementById('page').classList.remove('show');document.body.style.overflow='';}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closePage();});
+</script>
+</body>
+</html>
