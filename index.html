@@ -178,15 +178,6 @@ section{padding:100px 56px;border-top:1px solid var(--line);position:relative}
 #modalMsg.err{color:var(--green);opacity:.7;text-decoration:underline}
 @media(max-width:520px){.email-form{flex-direction:column}.email-form input{border-bottom:1px solid rgba(229,225,214,.3)}}
 .signups{margin-top:28px;font-size:11px;color:rgba(229,225,214,.45);letter-spacing:1px}
-.ca-box{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);padding:9px 16px;font-size:11px;letter-spacing:1px;color:var(--green);margin-top:28px;background:var(--paper-warm);cursor:pointer;transition:all .2s;max-width:100%;overflow:hidden}
-.ca-box:hover{border-color:var(--green);background:var(--paper-deep)}
-.ca-box .ca-label{color:var(--ink-soft);font-size:9px;letter-spacing:2px;white-space:nowrap;flex-shrink:0}
-.ca-box .ca-addr{font-size:10.5px;letter-spacing:.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ca-box .ca-copy{flex-shrink:0;opacity:.55;font-size:10px}
-.foot-ca{margin-top:14px;font-size:10px;color:var(--green);letter-spacing:.5px;line-height:1.7}
-.foot-ca span{display:block;font-size:9px;letter-spacing:2px;color:var(--ink-soft);margin-bottom:3px}
-.foot-ca .foot-ca-addr{word-break:break-all;cursor:pointer;transition:opacity .2s}
-.foot-ca .foot-ca-addr:hover{opacity:.7}
 footer{background:var(--paper);padding:54px 56px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;font-size:12px;color:var(--ink-soft);border-top:1px solid var(--line)}
 @media(max-width:780px){footer{padding:40px 24px}}
 .foot-col h4{color:var(--green);font-size:11px;letter-spacing:2px;margin-bottom:16px}
@@ -267,11 +258,6 @@ footer{background:var(--paper);padding:54px 56px;display:flex;justify-content:sp
       <div class="stat"><div class="n">214</div><div class="l">repos shipped</div></div>
       <div class="stat"><div class="n">91%</div><div class="l">first-deploy pass</div></div>
       <div class="stat"><div class="n">seed</div><div class="l">stage &middot; 2026</div></div>
-    </div>
-    <div class="ca-box" onclick="copyCA()" title="Click to copy">
-      <span class="ca-label">$TALOS CA</span>
-      <span class="ca-addr">SOON</span>
-      <span class="ca-copy">&#10697;</span>
     </div>
   </div>
   <div class="hero-right">
@@ -363,7 +349,7 @@ footer{background:var(--paper);padding:54px 56px;display:flex;justify-content:sp
   <div class="signups" id="signupCount">&mdash; join 142 engineers on the waitlist &mdash;</div>
 </div>
 <footer>
-  <div class="foot-col foot-brand"><div class="ttl">&#9884; TALOS</div><p style="line-height:1.75">Autonomous software engineering, built on open research. The guardian that closes tickets while you close your laptop.</p><p style="margin-top:14px;color:var(--green)">&#9884; built on Nous Research</p><div class="foot-ca"><span>$TALOS CONTRACT ADDRESS</span><div class="foot-ca-addr" onclick="copyCA()" title="Click to copy">0xDcb35Db5e40D1B53e54bb7cfE8F9730EcddB9bA3</div></div></div>
+  <div class="foot-col foot-brand"><div class="ttl">&#9884; TALOS</div><p style="line-height:1.75">Autonomous software engineering, built on open research. The guardian that closes tickets while you close your laptop.</p><p style="margin-top:14px;color:var(--green)">&#9884; built on Nous Research</p></div>
   <div class="foot-col"><h4>PRODUCT</h4><a href="#agents">the swarm</a><a href="#moa">architecture</a><a href="#evolution">skill evolution</a><a href="#pricing">pricing</a></div>
   <div class="foot-col"><h4>DEVELOPERS</h4><a href="#run">live run</a><a href="#" onclick="comingSoon(event)">API</a><a href="#" onclick="comingSoon(event)">changelog</a><a href="https://github.com/talosagent/talos-agent" target="_blank" rel="noopener">github</a></div>
   <div class="foot-col"><h4>COMPANY</h4><a href="#" onclick="openPage(event,'manifesto')">manifesto</a><a href="#" onclick="openPage(event,'research')">research</a><a href="#" onclick="openPage(event,'careers')">careers</a><a href="#" onclick="openPage(event,'docs')">docs</a>
@@ -458,7 +444,6 @@ var io=new IntersectionObserver(function(es){es.forEach(function(e){
 });},{threshold:.12});
 document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
 function scrollToAccess(){document.getElementById('access').scrollIntoView();setTimeout(function(){document.getElementById('emailInput').focus();},600);}
-function copyCA(){var addr='0xDcb35Db5e40D1B53e54bb7cfE8F9730EcddB9bA3';navigator.clipboard.writeText(addr).then(function(){toast('✔ $TALOS CA copied to clipboard');}).catch(function(){toast('CA: '+addr);});}
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tm);t._tm=setTimeout(function(){t.classList.remove('show');},3200);}
 function comingSoon(e){e.preventDefault();toast('\u25F7 Coming soon \u2014 request access for the beta.');}
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
